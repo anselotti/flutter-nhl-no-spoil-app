@@ -45,9 +45,9 @@ class _GamesPageState extends State<GamesPage> {
 
   void _onDateSelected(DateTime selectedDate) {
     setState(() {
-      _selectedDate = selectedDate; // Päivitä valittu päivämäärä
+      _selectedDate = selectedDate; // Update selected date
     });
-    _fetchSchedule(selectedDate); // Päivitä pelitiedot uudella päivämäärällä
+    _fetchSchedule(selectedDate); // Update games
   }
 
   void _toggleScoreVisibility(String gameId) {
