@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:nhl_results_app/screens/results.dart';
-import '/screens/home.dart';
+import 'package:nhl_results_app/screens/results/results.dart';
+import 'package:nhl_results_app/widgets/app_bar.dart';
+import '/screens/games/games.dart';
 
 class Layout extends StatefulWidget {
   const Layout({super.key});
@@ -14,29 +15,18 @@ class _LayoutState extends State<Layout> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          <String>[
-            'No Spoil NHL - Games',
-            'No Spoil NHL - Results',
-          ][currentPageIndex],
-        ),
-        titleTextStyle: const TextStyle(
-          color: Color.fromRGBO(255, 255, 255, 1),
-          fontSize: 20.0,
-        ),
-        backgroundColor: const Color.fromRGBO(0, 31, 63, 1.0),
+      appBar: ScoreCoverAppBar(
+        title: ['ScoreCover - Games', 'ScoreCover - Results'][currentPageIndex],
       ),
       bottomNavigationBar: NavigationBar(
-        backgroundColor: const Color.fromRGBO(106, 154, 176, 1.0),
+        backgroundColor: const Color.fromRGBO(127, 127, 127, 1.0),
         onDestinationSelected: (int index) {
           setState(() {
             currentPageIndex = index;
           });
         },
-        indicatorColor: const Color.fromRGBO(234, 216, 177, 1.0),
+        indicatorColor: const Color.fromRGBO(244, 216, 0, 1.0),
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
@@ -47,7 +37,7 @@ class _LayoutState extends State<Layout> {
           NavigationDestination(
             icon: Badge(
               child: Icon(Icons.calendar_today_sharp),
-              ),
+            ),
             label: 'Results',
           ),
           // NavigationDestination(
@@ -61,7 +51,7 @@ class _LayoutState extends State<Layout> {
       ),
       body: <Widget>[
         /// Home page
-        const MyHomePage(title: 'Recapp'),
+        const GamesPage(title: 'Recapp'),
 
         /// Notifications page
         const Results(),

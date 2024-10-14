@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 
-class RecappAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const RecappAppBar({super.key, required this.title});
+class ScoreCoverAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const ScoreCoverAppBar({super.key, required this.title});
   final String title;
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(title),
-      );
+     return AppBar(
+      backgroundColor: const Color.fromRGBO(7, 7, 7, 1.0),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
+    );
       
   }
 

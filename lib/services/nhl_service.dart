@@ -6,11 +6,11 @@ class NHLService {
   static const String baseUrl = 'https://api-web.nhle.com/v1';
 
   // Hakee aikataulut ja perustiedot
-  Future<Map<String, dynamic>> fetchSchedule() async {
-    final now = DateTime.now().toUtc().subtract(const Duration(days:1));
-    final String today = DateFormat('yyyy-MM-dd').format(now);
+  Future<Map<String, dynamic>> fetchSchedule(DateTime date) async {
+    date = date.toUtc();
+    final String newDate = DateFormat('yyyy-MM-dd').format(date);
 
-    final response = await http.get(Uri.parse('$baseUrl/schedule/$today'));
+    final response = await http.get(Uri.parse('$baseUrl/schedule/$newDate'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
