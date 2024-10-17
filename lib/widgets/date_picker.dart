@@ -39,7 +39,7 @@ class _DatePickerState extends State<DatePicker> {
           const SizedBox(height: 12.0),
           ElevatedButton(
             onPressed: () => _selectDate(context),
-            child: Text(DateFormat('dd.MM.yyyy').format(_selectedDate!.toUtc())),
+            child: Text(DateFormat('dd.MM.yyyy').format(_selectedDate!)),
           ),
           const SizedBox(height: 12.0),
         ],

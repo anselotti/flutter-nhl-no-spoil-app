@@ -6,8 +6,7 @@ class NHLService {
   static const String baseUrl = 'https://api-web.nhle.com/v1';
 
   // Hakee aikataulut ja perustiedot
-  Future<Map<String, dynamic>> fetchSchedule(DateTime date) async {
-    date = date.toUtc();
+  Future<Map<String, dynamic>> fetchSchedule(DateTime date) async {;
     final String newDate = DateFormat('yyyy-MM-dd').format(date);
 
     final response = await http.get(Uri.parse('$baseUrl/schedule/$newDate'));

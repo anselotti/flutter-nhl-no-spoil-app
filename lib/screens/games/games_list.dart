@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class GamesList extends StatelessWidget {
+class GamesList extends StatefulWidget {
   final List<dynamic> games;
   final Map<String, bool> showScoresMap;
   final Function(String gameId) toggleScoreVisibility;
   final Function(String gameId) playShortVideo;
   final Function(String gameId) playLongVideo;
+  final Map<String, Map<String, bool>> videoAvailabilityMap;
 
   const GamesList({
     Key? key,
@@ -15,11 +16,41 @@ class GamesList extends StatelessWidget {
     required this.toggleScoreVisibility,
     required this.playShortVideo,
     required this.playLongVideo,
+    required this.videoAvailabilityMap,
   }) : super(key: key);
 
   @override
+  _GamesListState createState() => _GamesListState();
+}
+
+class _GamesListState extends State<GamesList> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkVideoAvailability();
+  }
+
+  Future<void> _checkVideoAvailability() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await Future.delayed(const Duration(seconds: 2)); // Simuloi latausta
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (games.isEmpty) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (widget.games.isEmpty) {
       return const Center(
         child: Text('No games found'),
       );
@@ -27,7 +58,7 @@ class GamesList extends StatelessWidget {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          for (var game in games)
+          for (var game in widget.games)
             if (game['gameScheduleState'] != 'PPD')
               Card(
                 color: const Color.fromRGBO(236, 241, 242, 1.0),
@@ -35,11 +66,12 @@ class GamesList extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
+                        Text(game['gameDate'].toString()),
                         TextButton(
-                          onPressed: () => toggleScoreVisibility(game['id'].toString()),
-                          child: Text(showScoresMap[game['id'].toString()]!
+                          onPressed: () => widget.toggleScoreVisibility(game['id'].toString()),
+                          child: Text(widget.showScoresMap[game['id'].toString()]!
                               ? 'Hide scores'
                               : 'Show scores'),
                         ),
@@ -56,7 +88,7 @@ class GamesList extends StatelessWidget {
                         children: [
                           Text(game['homeTeam']['placeName']['default'].toString()),
                           Text(
-                            showScoresMap[game['id'].toString()]!
+                            widget.showScoresMap[game['id'].toString()]!
                                 ? game['homeTeam']['score'].toString()
                                 : '-',
                           ),
@@ -74,7 +106,7 @@ class GamesList extends StatelessWidget {
                         children: [
                           Text(game['awayTeam']['placeName']['default'].toString()),
                           Text(
-                            showScoresMap[game['id'].toString()]!
+                            widget.showScoresMap[game['id'].toString()]!
                                 ? game['awayTeam']['score'].toString()
                                 : '-',
                           ),
@@ -84,29 +116,39 @@ class GamesList extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        TextButton(
-                          onPressed: () => playShortVideo(game['id'].toString()),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.play_circle_outline_sharp),
-                              SizedBox(width: 4),
-                              Text('Short'),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        TextButton(
-                          onPressed: () => playLongVideo(game['id'].toString()),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.movie_creation_sharp),
-                              SizedBox(width: 4),
-                              Text('Long'),
-                            ],
-                          ),
-                        ),
+                        if (widget.videoAvailabilityMap[game['id'].toString()]?['shortVideo'] == false && 
+                            widget.videoAvailabilityMap[game['id'].toString()]?['longVideo'] == false) ...[
+                          const Text('No videos available'),
+                        ] else ...[
+                          if (widget.videoAvailabilityMap[game['id'].toString()]?['shortVideo'] == true) ...[
+                            TextButton(
+                              onPressed: () => widget.playShortVideo(game['id'].toString()),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.play_circle_outline_sharp),
+                                  SizedBox(width: 4),
+                                  Text('Short'),
+                                ],
+                              ),
+                            ),
+                          ],
+                          const SizedBox(width: 8),
+                          if (widget.videoAvailabilityMap[game['id'].toString()]?['longVideo'] == true) ...[
+                            TextButton(
+                              onPressed: () => widget.playLongVideo(game['id'].toString()),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.movie_creation_sharp),
+                                  SizedBox(width: 4),
+                                  Text('Long'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ],
