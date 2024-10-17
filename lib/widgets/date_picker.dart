@@ -16,7 +16,7 @@ class _DatePickerState extends State<DatePicker> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? selected = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedDate!,
       firstDate: DateTime(2000),
       lastDate: DateTime(2050),
     );
@@ -26,24 +26,39 @@ class _DatePickerState extends State<DatePicker> {
     }
 
     if (_selectedDate != null) {
-      widget.onDateSelected(_selectedDate!); // Käytä non-null-arvoa
+      widget.onDateSelected(_selectedDate!);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const SizedBox(height: 12.0),
+          IconButton(onPressed: _previousDate, icon: const Icon(Icons.arrow_back)),
           ElevatedButton(
             onPressed: () => _selectDate(context),
             child: Text(DateFormat('dd.MM.yyyy').format(_selectedDate!)),
           ),
-          const SizedBox(height: 12.0),
+          IconButton(
+              onPressed: _nextDate, icon: const Icon(Icons.arrow_forward)),
         ],
       ),
     );
+  }
+
+  void _previousDate() {
+    setState(() {
+      _selectedDate = _selectedDate!.subtract(const Duration(days: 1));
+    });
+    widget.onDateSelected(_selectedDate!);
+  }
+
+  void _nextDate() {
+    setState(() {
+      _selectedDate = _selectedDate!.add(const Duration(days: 1));
+    });
+    widget.onDateSelected(_selectedDate!);
   }
 }

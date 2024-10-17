@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'game_page.dart';
+import 'package:intl/intl.dart';
 
 class GamesList extends StatefulWidget {
   final List<dynamic> games;
@@ -46,9 +48,9 @@ class _GamesListState extends State<GamesList> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    // if (_isLoading) {
+    //   return const Center(child: CircularProgressIndicator());
+    // }
 
     if (widget.games.isEmpty) {
       return const Center(
@@ -60,15 +62,27 @@ class _GamesListState extends State<GamesList> {
         children: <Widget>[
           for (var game in widget.games)
             if (game['gameScheduleState'] != 'PPD')
-              Card(
-                color: const Color.fromRGBO(236, 241, 242, 1.0),
+            InkWell(
+              onTap: () {
+                  // Navigate to GamesPage on card tap
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GamesPage(
+                        title: game['homeTeam']['name']['default'] + ' vs. ' +  game['awayTeam']['name']['default'].toString() + ' - ' + DateFormat('dd.MM.yyyy').format(DateTime.parse(game['gameDate'])),
+                        ), // Pass the game name or ID
+                    ),
+                  );
+                },
+              child: Card(
+                color: const Color.fromARGB(255, 68, 68, 68),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text(game['gameDate'].toString()),
+                        Text(''),
                         TextButton(
                           onPressed: () => widget.toggleScoreVisibility(game['id'].toString()),
                           child: Text(widget.showScoresMap[game['id'].toString()]!
@@ -80,13 +94,15 @@ class _GamesListState extends State<GamesList> {
                     ListTile(
                       leading: SvgPicture.network(
                         game['homeTeam']['logo'],
-                        placeholderBuilder: (BuildContext context) => const CircularProgressIndicator(),
+                        placeholderBuilder: (BuildContext context) => const CircularProgressIndicator(
+                          color: Color.fromRGBO(38, 173, 190, 0),
+                        ),
                         height: 20.0,
                       ),
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(game['homeTeam']['placeName']['default'].toString()),
+                          Text(game['homeTeam']['name']['default'].toString()),
                           Text(
                             widget.showScoresMap[game['id'].toString()]!
                                 ? game['homeTeam']['score'].toString()
@@ -98,13 +114,15 @@ class _GamesListState extends State<GamesList> {
                     ListTile(
                       leading: SvgPicture.network(
                         game['awayTeam']['logo'],
-                        placeholderBuilder: (BuildContext context) => const CircularProgressIndicator(),
+                        placeholderBuilder: (BuildContext context) => const CircularProgressIndicator(
+                          color: Color.fromRGBO(38, 173, 190, 0),
+                        ),
                         height: 20.0,
                       ),
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(game['awayTeam']['placeName']['default'].toString()),
+                          Text(game['awayTeam']['name']['default'].toString()),
                           Text(
                             widget.showScoresMap[game['id'].toString()]!
                                 ? game['awayTeam']['score'].toString()
@@ -118,7 +136,7 @@ class _GamesListState extends State<GamesList> {
                       children: <Widget>[
                         if (widget.videoAvailabilityMap[game['id'].toString()]?['shortVideo'] == false && 
                             widget.videoAvailabilityMap[game['id'].toString()]?['longVideo'] == false) ...[
-                          const Text('No videos available'),
+                            const Text('No videos available'),
                         ] else ...[
                           if (widget.videoAvailabilityMap[game['id'].toString()]?['shortVideo'] == true) ...[
                             TextButton(
@@ -148,12 +166,13 @@ class _GamesListState extends State<GamesList> {
                             ),
                           ],
                         ],
-                        const SizedBox(height: 16),
                       ],
                     ),
                   ],
                 ),
               ),
+            ),
+              
         ],
       );
     }

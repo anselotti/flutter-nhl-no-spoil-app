@@ -5,7 +5,7 @@ void main() {
   runApp(const MyApp());
 }
 
-const primaryColor = Color.fromRGBO(9, 16, 87, 1.0);
+const primaryColor = Colors.blue;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -14,8 +14,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'NHL koosteet',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromRGBO(244, 216, 0, 0)),
-        useMaterial3: true,
+        colorScheme: ColorScheme.dark(
+          primary: Colors.blue,
+          secondary: const Color.fromRGBO(244, 216, 0, 1.0),
+        )
       ),
       home: const Layout(),
     );

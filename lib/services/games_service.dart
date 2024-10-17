@@ -7,11 +7,8 @@ class GamesService {
 
   Future<List<dynamic>> fetchSchedule(DateTime date) async {
     final scheduleData = await _nhlService.fetchSchedule(date);
-    if (scheduleData['gameWeek'] != null &&
-        scheduleData['gameWeek'][0]['games'] != null) {
-      return scheduleData['gameWeek'][0]['games'];
-    }
-    return [];
+
+    return scheduleData['games'];
   }
 
   Future<Map<String, bool>> fetchVideoAvailability(String gameId) async {

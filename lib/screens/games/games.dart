@@ -93,7 +93,9 @@ class _GamesPageState extends State<GamesPage> {
         children: [
           DatePicker(onDateSelected: _onDateSelected),
           _isLoading
-              ? const Center(child: CircularProgressIndicator()) // Näytetään spinneri, kun tietoja haetaan
+              ? const Center(child: CircularProgressIndicator(
+                color: Colors.blue,
+              )) // Näytetään spinneri, kun tietoja haetaan
               : _games.isEmpty
                   ? const Center(child: Text('No games found'))
                   : GamesList(

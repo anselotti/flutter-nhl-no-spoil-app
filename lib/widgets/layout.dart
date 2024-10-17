@@ -36,17 +36,10 @@ class _LayoutState extends State<Layout> {
           ),
           NavigationDestination(
             icon: Badge(
-              child: Icon(Icons.calendar_today_sharp),
+              child: Icon(Icons.table_rows_sharp),
             ),
-            label: 'Results',
+            label: 'Fixtures',
           ),
-          // NavigationDestination(
-          //   icon: Badge(
-          //     label: Text('2'),
-          //     child: Icon(Icons.messenger_sharp),
-          //   ),
-          //   label: 'Messages',
-          // ),
         ],
       ),
       body: <Widget>[
@@ -54,7 +47,7 @@ class _LayoutState extends State<Layout> {
         const GamesPage(title: 'Recapp'),
 
         /// Notifications page
-        const Results(),
+        const Fixtures(),
       ][currentPageIndex],
     );
   }

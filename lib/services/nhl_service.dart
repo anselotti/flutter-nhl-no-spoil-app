@@ -9,7 +9,7 @@ class NHLService {
   Future<Map<String, dynamic>> fetchSchedule(DateTime date) async {;
     final String newDate = DateFormat('yyyy-MM-dd').format(date);
 
-    final response = await http.get(Uri.parse('$baseUrl/schedule/$newDate'));
+    final response = await http.get(Uri.parse('$baseUrl/score/$newDate'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
