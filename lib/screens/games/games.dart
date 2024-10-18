@@ -13,38 +13,37 @@ class GamesPage extends StatefulWidget {
 }
 
 class _GamesPageState extends State<GamesPage> {
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now().subtract(const Duration(days: 1));
   final GamesService _gamesService = GamesService();
 
-  List<dynamic> _games = [];
-  Map<String, bool> _showScoresMap = {};
-  Map<String, Map<String, bool>> _videoAvailabilityMap = {};
-  bool _isLoading = true; // Lataustilan seurantaan pelien ja videoiden haun aikana
+  final List<Map<String, dynamic>> _games = [];
+  final Map<String, bool> _showScoresMap = {};
+  final Map<String, Map<String, bool>> _videoAvailabilityMap = {};
+  bool _isLoading = false;
   String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    _fetchScheduleAndVideoAvailability(_selectedDate); // Haetaan pelitiedot ja videoiden saatavuus ensimmäisen kerran
+    _fetchScheduleAndVideoAvailability(_selectedDate);
   }
 
   void _fetchScheduleAndVideoAvailability(DateTime date) async {
     setState(() {
-      _isLoading = true; // Aloitetaan lataus
+      _isLoading = true;
+      _games.clear(); // Tyhjennetään aiemmat pelit
+      _showScoresMap.clear();
     });
 
     try {
       final scheduleData = await _gamesService.fetchSchedule(date);
-      setState(() {
-        _games = scheduleData;
-        _showScoresMap = {for (var game in _games) game['id'].toString(): false};
-      });
 
-      // Kun pelit on ladattu, haetaan videoiden saatavuus
-      await _fetchVideoAvailability();
-
+      for (var game in scheduleData) {
+        await _loadGameData(game);
+      }
+      
       setState(() {
-        _isLoading = false; // Lataus valmis
+        _isLoading = false; // Kaikki pelit ladattu
       });
     } catch (e) {
       setState(() {
@@ -54,29 +53,22 @@ class _GamesPageState extends State<GamesPage> {
     }
   }
 
-  Future<void> _fetchVideoAvailability() async {
-    try {
-      Map<String, Map<String, bool>> videoAvailability = {};
-      for (var game in _games) {
-        final gameId = game['id'].toString();
-        final availability = await _gamesService.fetchVideoAvailability(gameId);
-        videoAvailability[gameId] = availability;
-      }
-      setState(() {
-        _videoAvailabilityMap = videoAvailability;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Error fetching video availability: $e';
-      });
-    }
+  Future<void> _loadGameData(Map<String, dynamic> game) async {
+    final gameId = game['id'].toString();
+    final availability = await _gamesService.fetchVideoAvailability(gameId);
+    
+    setState(() {
+      _games.add(game);
+      _showScoresMap[gameId] = false;
+      _videoAvailabilityMap[gameId] = availability;
+    });
   }
 
   void _onDateSelected(DateTime selectedDate) {
     setState(() {
-      _selectedDate = selectedDate; // Päivitetään valittu päivämäärä
+      _selectedDate = selectedDate;
     });
-    _fetchScheduleAndVideoAvailability(selectedDate); // Hae pelitiedot ja videoiden saatavuus valitun päivämäärän perusteella
+    _fetchScheduleAndVideoAvailability(selectedDate);
   }
 
   void _toggleScoreVisibility(String gameId) {
@@ -92,10 +84,9 @@ class _GamesPageState extends State<GamesPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           DatePicker(onDateSelected: _onDateSelected),
+          const SizedBox(height: 16),
           _isLoading
-              ? const Center(child: CircularProgressIndicator(
-                color: Colors.blue,
-              )) // Näytetään spinneri, kun tietoja haetaan
+              ? const Center(child: CircularProgressIndicator())
               : _games.isEmpty
                   ? const Center(child: Text('No games found'))
                   : GamesList(

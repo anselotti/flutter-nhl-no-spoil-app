@@ -12,13 +12,12 @@ class GamesPage extends StatefulWidget {
 class _GamesPageState extends State<GamesPage> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        titleTextStyle: TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.normal,
-        ),
       ),
       body: const Center(
         child: Text('Games Page'),

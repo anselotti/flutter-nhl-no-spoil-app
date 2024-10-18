@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'game_page.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 
 class GamesList extends StatefulWidget {
   final List<dynamic> games;
@@ -26,32 +27,33 @@ class GamesList extends StatefulWidget {
 }
 
 class _GamesListState extends State<GamesList> {
-  bool _isLoading = true;
+  Map<String, bool> _loadingMap = {}; // Track loading state for each game
 
   @override
   void initState() {
     super.initState();
-    _checkVideoAvailability();
+    _fetchVideoAvailability(); // Fetch video availability for each game
   }
 
-  Future<void> _checkVideoAvailability() async {
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> _fetchVideoAvailability() async {
+    for (var game in widget.games) {
+      final gameId = game['id'].toString();
+      setState(() {
+        _loadingMap[gameId] = true; // Set loading for this game
+      });
 
-    await Future.delayed(const Duration(seconds: 2)); // Simuloi latausta
+      // Simulate fetching video availability (replace this with actual fetch)
+      await Future.delayed(const Duration(seconds: 2));
 
-    setState(() {
-      _isLoading = false;
-    });
+      // Mark loading as complete for this game
+      setState(() {
+        _loadingMap[gameId] = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // if (_isLoading) {
-    //   return const Center(child: CircularProgressIndicator());
-    // }
-
     if (widget.games.isEmpty) {
       return const Center(
         child: Text('No games found'),
@@ -62,117 +64,150 @@ class _GamesListState extends State<GamesList> {
         children: <Widget>[
           for (var game in widget.games)
             if (game['gameScheduleState'] != 'PPD')
-            InkWell(
-              onTap: () {
-                  // Navigate to GamesPage on card tap
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => GamesPage(
-                        title: game['homeTeam']['name']['default'] + ' vs. ' +  game['awayTeam']['name']['default'].toString() + ' - ' + DateFormat('dd.MM.yyyy').format(DateTime.parse(game['gameDate'])),
-                        ), // Pass the game name or ID
-                    ),
-                  );
-                },
-              child: Card(
-                color: const Color.fromARGB(255, 68, 68, 68),
+              Card(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(''),
-                        TextButton(
-                          onPressed: () => widget.toggleScoreVisibility(game['id'].toString()),
-                          child: Text(widget.showScoresMap[game['id'].toString()]!
-                              ? 'Hide scores'
-                              : 'Show scores'),
-                        ),
-                      ],
-                    ),
+                    if (game['gameState'] == 'OFF') ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.access_time, size: 16),
+                                const SizedBox(width: 4),
+                                Text(DateFormat('HH:mm').format(DateTime.parse(game['startTimeUTC']).toLocal())),
+                              ],
+                            ),
+                          ),
+                           
+                        ],
+
+                      )
+                    ] else ...[            
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          TextButton(
+                            onPressed: () => widget.toggleScoreVisibility(game['id'].toString()),
+                            child: Text(
+                              widget.showScoresMap[game['id'].toString()]! ? 'Hide scores' : 'Show scores',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     ListTile(
-                      leading: SvgPicture.network(
-                        game['homeTeam']['logo'],
-                        placeholderBuilder: (BuildContext context) => const CircularProgressIndicator(
-                          color: Color.fromRGBO(38, 173, 190, 0),
-                        ),
+                    leading: CachedNetworkSVGImage(
+                      game['homeTeam']['logo'],
+                        placeholder: const CircularProgressIndicator(),
+                        errorWidget: const Icon(Icons.error),
                         height: 20.0,
                       ),
+                    
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(game['homeTeam']['name']['default'].toString()),
                           Text(
-                            widget.showScoresMap[game['id'].toString()]!
-                                ? game['homeTeam']['score'].toString()
-                                : '-',
+                            game['homeTeam']['name']['default'].toString(),
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            widget.showScoresMap[game['id'].toString()]! ? game['homeTeam']['score'].toString() : '',
                           ),
                         ],
                       ),
                     ),
                     ListTile(
-                      leading: SvgPicture.network(
+                      leading: CachedNetworkSVGImage(
                         game['awayTeam']['logo'],
-                        placeholderBuilder: (BuildContext context) => const CircularProgressIndicator(
-                          color: Color.fromRGBO(38, 173, 190, 0),
-                        ),
+                        placeholder: const CircularProgressIndicator(),
+                        errorWidget: const Icon(Icons.error),
                         height: 20.0,
                       ),
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(game['awayTeam']['name']['default'].toString()),
                           Text(
-                            widget.showScoresMap[game['id'].toString()]!
-                                ? game['awayTeam']['score'].toString()
-                                : '-',
+                            game['awayTeam']['name']['default'].toString(),
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            widget.showScoresMap[game['id'].toString()]! ? game['awayTeam']['score'].toString() : '',
                           ),
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        if (widget.videoAvailabilityMap[game['id'].toString()]?['shortVideo'] == false && 
-                            widget.videoAvailabilityMap[game['id'].toString()]?['longVideo'] == false) ...[
-                            const Text('No videos available'),
-                        ] else ...[
-                          if (widget.videoAvailabilityMap[game['id'].toString()]?['shortVideo'] == true) ...[
-                            TextButton(
-                              onPressed: () => widget.playShortVideo(game['id'].toString()),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.play_circle_outline_sharp),
-                                  SizedBox(width: 4),
-                                  Text('Short'),
-                                ],
+                    const SizedBox(height: 16),
+                    const Divider(thickness: 0.5),
+                    const SizedBox(height: 16),
+                    
+                    // Check loading state for video availability
+                    _loadingMap[game['id'].toString()] == true 
+                        ? const CircularProgressIndicator() // Show loading indicator
+                        : (widget.videoAvailabilityMap[game['id'].toString()]?['shortVideo'] == false &&
+                           widget.videoAvailabilityMap[game['id'].toString()]?['longVideo'] == false)
+                            ? const Text('No videos available')
+                            : Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () => widget.playShortVideo(game['id'].toString()),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.play_circle_outline_sharp),
+                                            SizedBox(width: 4),
+                                            Text('Short'),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () => widget.playLongVideo(game['id'].toString()),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.movie_creation_sharp),
+                                            SizedBox(width: 4),
+                                            Text('Long'),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                    
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GamesPage(
+                                title: '${game['homeTeam']['name']['default']} vs. ${game['awayTeam']['name']['default']} - ${DateFormat('dd.MM.yyyy').format(DateTime.parse(game['gameDate']))}',
                               ),
                             ),
-                          ],
-                          const SizedBox(width: 8),
-                          if (widget.videoAvailabilityMap[game['id'].toString()]?['longVideo'] == true) ...[
-                            TextButton(
-                              onPressed: () => widget.playLongVideo(game['id'].toString()),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.movie_creation_sharp),
-                                  SizedBox(width: 4),
-                                  Text('Long'),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ],
+                          );
+                        },
+                        child: const Text('View game details'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 48),
+                        ),
+                      ),
                     ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
-            ),
-              
         ],
       );
     }

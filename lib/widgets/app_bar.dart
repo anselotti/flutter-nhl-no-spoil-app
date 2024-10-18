@@ -7,8 +7,15 @@ class ScoreCoverAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
      return AppBar(
-      backgroundColor: const Color.fromRGBO(7, 7, 7, 1.0),
-      title: Text(title, style: const TextStyle(color: Colors.white)),
+      // backgroundColor: const Color.fromRGBO(7, 7, 7, 1.0),
+      title: Row(
+        children: [
+          Image.asset(
+                'assets/images/ScoreCover_logo.png',
+                height: 30,
+              ),
+      ],
+      ),
     );
   }
 

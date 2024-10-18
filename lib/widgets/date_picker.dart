@@ -32,6 +32,9 @@ class _DatePickerState extends State<DatePicker> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -39,11 +42,12 @@ class _DatePickerState extends State<DatePicker> {
           IconButton(onPressed: _previousDate, icon: const Icon(Icons.arrow_back)),
           ElevatedButton(
             onPressed: () => _selectDate(context),
-            child: Text(DateFormat('dd.MM.yyyy').format(_selectedDate!)),
+           
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.white),
-              foregroundColor: MaterialStateProperty.all(Colors.black),
+              backgroundColor: WidgetStateProperty.all(colorScheme.primary),
+              foregroundColor: WidgetStateProperty.all(colorScheme.onPrimary),
             ),
+             child: Text(DateFormat('dd.MM.yyyy').format(_selectedDate!)),
           ),
           IconButton(
               onPressed: _nextDate, icon: const Icon(Icons.arrow_forward)),

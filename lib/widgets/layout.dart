@@ -15,22 +15,25 @@ class _LayoutState extends State<Layout> {
 
   @override
   Widget build(BuildContext context) {
+
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: ScoreCoverAppBar(
         title: ['ScoreCover - Games', 'ScoreCover - Results'][currentPageIndex],
       ),
       bottomNavigationBar: NavigationBar(
-        backgroundColor: const Color.fromRGBO(127, 127, 127, 1.0),
+        backgroundColor: Color.fromRGBO(34, 34, 34, 1),
         onDestinationSelected: (int index) {
           setState(() {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.blue,
+        indicatorColor: colorScheme.primary,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
-            selectedIcon: Icon(Icons.sports_hockey_sharp),
+            selectedIcon: Icon(Icons.sports_hockey_sharp, color: Colors.white),
             icon: Icon(Icons.sports_hockey_sharp),
             label: 'Games',
           ),
