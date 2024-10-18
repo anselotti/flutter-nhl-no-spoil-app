@@ -40,6 +40,10 @@ class _DatePickerState extends State<DatePicker> {
           ElevatedButton(
             onPressed: () => _selectDate(context),
             child: Text(DateFormat('dd.MM.yyyy').format(_selectedDate!)),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.white),
+              foregroundColor: MaterialStateProperty.all(Colors.black),
+            ),
           ),
           IconButton(
               onPressed: _nextDate, icon: const Icon(Icons.arrow_forward)),

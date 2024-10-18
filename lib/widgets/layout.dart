@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nhl_results_app/screens/results/results.dart';
+import 'package:nhl_results_app/screens/fixtures/fixtures.dart';
 import 'package:nhl_results_app/widgets/app_bar.dart';
 import '/screens/games/games.dart';
 
@@ -26,7 +26,7 @@ class _LayoutState extends State<Layout> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: const Color.fromRGBO(244, 216, 0, 1.0),
+        indicatorColor: Colors.blue,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
@@ -36,7 +36,7 @@ class _LayoutState extends State<Layout> {
           ),
           NavigationDestination(
             icon: Badge(
-              child: Icon(Icons.table_rows_sharp),
+              child: Icon(Icons.table_chart_sharp),
             ),
             label: 'Fixtures',
           ),

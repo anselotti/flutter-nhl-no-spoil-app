@@ -9,13 +9,15 @@ class Fixtures extends StatelessWidget {
       padding: EdgeInsets.all(8.0),
       child: Column(
         children: <Widget>[
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.calendar_month_sharp),
-              title: Text('Result 1'),
-              subtitle: Text('This is a notification'),
-            ),
-          ),
+          Center(child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Icon(Icons.table_chart_sharp, size: 50.0),
+              Text('Fixtures', style: TextStyle(fontSize: 24.0)),
+              Text('Coming soon', style: TextStyle(fontSize: 16.0)),
+            ],
+          )),
         ],
       ),
     );
